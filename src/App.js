@@ -1,23 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import { useMediaQuery } from "react-responsive";
+import { Container, Spinner } from "react-bootstrap";
 
+import OutputMobile from "./component/outputMobile";
+import OutputDesktop from "./component/outputDesktop";
+
+
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
 function App() {
+  const isDesktopOrLaptop = useMediaQuery({
+    query: "(min-width: 1224px)",
+  });
+  const [data, setData] = useState([]);
+  async function getData() {
+    await fetch("data.json", {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (json) {
+        setData(json);
+      });
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  if (!data.length) return <Spinner animation="border" />;
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <h1>Ponch Castor's JSON Output</h1>
+      <Container id="body">
+      
+        <OutputDesktop data={data} isHidden={!isDesktopOrLaptop} /> :
+        <OutputMobile data={data} isHidden={isDesktopOrLaptop}/>
+      </Container>
     </div>
   );
 }
